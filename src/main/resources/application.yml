@@ -1,0 +1,7 @@
+logging:
+  level:
+    tracer: TRACE
+    org.zalando.logbook: TRACE
+    org.hibernate.SQL: DEBUG
+    com.netflix.eureka: 'OFF'
+    org.elasticsearch.client.RestClient: ERROR
