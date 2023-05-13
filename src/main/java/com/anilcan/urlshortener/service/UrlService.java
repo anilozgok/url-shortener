@@ -15,6 +15,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -48,6 +50,14 @@ public class UrlService {
     public UrlDto getURLByShortURL(String shortUrl) {
         log.info("getURLByShortURL service caught with shortUrl: " + shortUrl);
         return new UrlDto(getURLObjectByShortURL(shortUrl).getLongURL());
+    }
+
+    public List<ImmutableTriple<String, String, LocalDateTime>> getAll() {
+        log.info("getAll service processing.");
+        return urlRepository.findAll()
+                     .stream()
+                     .map(url -> ImmutableTriple.of(url.getLongURL(), url.getShortURL(), url.getCreatedAt()))
+                     .collect(Collectors.toList());
     }
 
     public void deleteShortUrl(String shortUrl) {

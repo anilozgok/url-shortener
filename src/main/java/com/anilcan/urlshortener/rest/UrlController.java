@@ -3,6 +3,7 @@ package com.anilcan.urlshortener.rest;
 import com.anilcan.urlshortener.model.dto.UrlDto;
 import com.anilcan.urlshortener.model.request.NewShortUrlRequest;
 import com.anilcan.urlshortener.model.response.LongUrlResponse;
+import com.anilcan.urlshortener.model.response.UrlListResponse;
 import com.anilcan.urlshortener.model.response.UrlResponse;
 import com.anilcan.urlshortener.service.UrlService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -34,11 +36,23 @@ public class UrlController {
         return new ResponseEntity<>(new UrlResponse(shortenedUrl.left, shortenedUrl.middle, shortenedUrl.right), HttpStatus.OK);
     }
 
-    @GetMapping("/get/{shortUrl}")
+    @GetMapping("/{shortUrl}")
     public ResponseEntity<LongUrlResponse> getLongUrlByShortUrl(@PathVariable String shortUrl) {
         log.info("getLongUrlByShortUrl method caught shortUrl: " + shortUrl);
         var urlDto = urlService.getURLByShortURL(shortUrl);
         return new ResponseEntity<>(new LongUrlResponse(urlDto.longUrl()), HttpStatus.OK);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<UrlListResponse> getAll() {
+        log.info("getAll request caught.");
+        var allUrls = urlService.getAll();
+        var urlListResponse = new UrlListResponse(
+                allUrls.stream()
+                        .map(triple -> new UrlResponse(triple.left, triple.middle, triple.right))
+                        .collect(Collectors.toList()));
+
+        return new ResponseEntity<>(urlListResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{shortUrl}")
